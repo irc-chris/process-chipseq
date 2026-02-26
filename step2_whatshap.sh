@@ -76,7 +76,6 @@ whatshap haplotag \
     --reference "$refSeq" \
     --ignore-read-groups \
     --output-haplotag-list "$HAPLOTAG_LIST" \
-    --skip-missing-contigs \
     "$vcf" "$FILTERED_BAM"
 
 echo "$(date) Running WhatsHap split..."
