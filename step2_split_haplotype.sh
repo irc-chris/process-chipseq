@@ -20,10 +20,10 @@ outputdir="$topDir/aligned"
 
 [ -f "$ALIGNED_BAM" ] || { echo "Aligned BAM not found: $ALIGNED_BAM"; exit 1; }
 
-HAP1_RAW="$outputdir/hap1.bam"
-HAP2_RAW="$outputdir/hap2.bam"
-HAP1_RENAMED="$outputdir/hap1_renamed.bam"
-HAP2_RENAMED="$outputdir/hap2_renamed.bam"
+HAP1_RAW="$outputdir/hap1_raw.bam"
+HAP2_RAW="$outputdir/hap2_raw.bam"
+HAP1_OUT="$outputdir/hap1.bam"
+HAP2_OUT="$outputdir/hap2.bam"
 
 echo "$(date) Extracting hap1 reads (chrom names matching _h1)..."
 { samtools view -@ 2 -H "$ALIGNED_BAM"; samtools view -@ 2 "$ALIGNED_BAM" | awk '$3 ~ /_h1/'; } \
@@ -34,9 +34,9 @@ echo "$(date) Extracting hap2 reads (chrom names matching _h2)..."
     | samtools view -bS -o "$HAP2_RAW"
 
 echo "$(date) Stripping _h1 tags from chromosome names..."
-samtools view -@ 2 -h "$HAP1_RAW" | sed 's/_h1//g' | samtools view -bS - > "$HAP1_RENAMED"
+samtools view -@ 2 -h "$HAP1_RAW" | sed 's/_h1//g' | samtools view -bS - > "$HAP1_OUT"
 
 echo "$(date) Stripping _h2 tags from chromosome names..."
-samtools view -@ 2 -h "$HAP2_RAW" | sed 's/_h2//g' | samtools view -bS - > "$HAP2_RENAMED"
+samtools view -@ 2 -h "$HAP2_RAW" | sed 's/_h2//g' | samtools view -bS - > "$HAP2_OUT"
 
 echo "$(date) Haplotype splitting complete."
