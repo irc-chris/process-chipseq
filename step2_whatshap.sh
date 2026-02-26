@@ -51,6 +51,19 @@ elif [ ! -f "${vcf}.tbi" ]; then
     vcf="$tmpdir/phased.vcf.gz"
 fi
 
+# Filter BAM to autosomes + chrX before running whatshap.
+# chrY is excluded — it is highly repetitive, causes whatshap contig errors,
+# and is routinely excluded from ChIP-seq analysis.
+# The original $ALIGNED_BAM (with all contigs) is still used by step4.
+FILTERED_BAM="$tmpdir/output.autosomes.bam"
+CHROMS="chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 \
+        chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 \
+        chr20 chr21 chr22 chrX"
+
+echo "$(date) Filtering BAM to autosomes + chrX (excluding chrY)..."
+samtools view -@ 4 -b "$ALIGNED_BAM" $CHROMS -o "$FILTERED_BAM"
+samtools index "$FILTERED_BAM"
+
 HAPLOTAGGED_BAM="$tmpdir/output.haplotagged.bam"
 HAPLOTAG_LIST="$tmpdir/haplotag-list.txt"
 HAP1_OUT="$outputdir/hap1.bam"
@@ -64,7 +77,7 @@ whatshap haplotag \
     --ignore-read-groups \
     --output-haplotag-list "$HAPLOTAG_LIST" \
     --skip-missing-contigs \
-    "$vcf" "$ALIGNED_BAM"
+    "$vcf" "$FILTERED_BAM"
 
 echo "$(date) Running WhatsHap split..."
 whatshap split \
