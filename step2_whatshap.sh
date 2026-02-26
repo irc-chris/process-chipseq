@@ -37,10 +37,6 @@ ALIGNED_BAM="$tmpdir/output.sorted.bam"
 
 [ -f "$ALIGNED_BAM" ] || { echo "Aligned BAM not found: $ALIGNED_BAM"; exit 1; }
 
-HAPLOTAGGED_BAM="$tmpdir/output.haplotagged.bam"
-HAP1_OUT="$outputdir/hap1.bam"
-HAP2_OUT="$outputdir/hap2.bam"
-
 # WhatsHap requires a bgzipped, tabix-indexed VCF.
 # If the provided VCF is uncompressed, bgzip/index a copy in tmpdir.
 if [[ "$vcf" != *.gz ]]; then
@@ -55,18 +51,26 @@ elif [ ! -f "${vcf}.tbi" ]; then
     vcf="$tmpdir/phased.vcf.gz"
 fi
 
+HAPLOTAGGED_BAM="$tmpdir/output.haplotagged.bam"
+HAPLOTAG_LIST="$tmpdir/haplotag-list.txt"
+HAP1_OUT="$outputdir/hap1.bam"
+HAP2_OUT="$outputdir/hap2.bam"
+UNTAGGED_OUT="$outputdir/untagged.bam"
+
 echo "$(date) Running WhatsHap haplotag..."
 whatshap haplotag \
     --output "$HAPLOTAGGED_BAM" \
     --reference "$refSeq" \
-    "$vcf" \
-    "$ALIGNED_BAM"
+    --ignore-read-groups \
+    --output-haplotag-list "$HAPLOTAG_LIST" \
+    --skip-missing-contigs \
+    "$vcf" "$ALIGNED_BAM"
 
-echo "$(date) Indexing haplotagged BAM..."
-samtools index "$HAPLOTAGGED_BAM"
-
-echo "$(date) Splitting by HP tag..."
-samtools view -@ 2 -b -d HP:1 "$HAPLOTAGGED_BAM" > "$HAP1_OUT"
-samtools view -@ 2 -b -d HP:2 "$HAPLOTAGGED_BAM" > "$HAP2_OUT"
+echo "$(date) Running WhatsHap split..."
+whatshap split \
+    --output-h1 "$HAP1_OUT" \
+    --output-h2 "$HAP2_OUT" \
+    --output-untagged "$UNTAGGED_OUT" \
+    "$HAPLOTAGGED_BAM" "$HAPLOTAG_LIST"
 
 echo "$(date) WhatsHap haplotagging and splitting complete."
