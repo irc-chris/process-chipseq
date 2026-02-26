@@ -50,3 +50,6 @@ else
 fi
 
 echo "$(date) Alignment complete: $ALIGNED_BAM"
+
+echo "$(date) Sorting"
+samtools index "$ALIGNED_BAM"
