@@ -37,10 +37,6 @@ ALIGNED_BAM="$tmpdir/output.sorted.bam"
 
 [ -f "$ALIGNED_BAM" ] || { echo "Aligned BAM not found: $ALIGNED_BAM"; exit 1; }
 
-HAPLOTAGGED_BAM="$tmpdir/output.haplotagged.bam"
-HAP1_OUT="$outputdir/hap1.bam"
-HAP2_OUT="$outputdir/hap2.bam"
-
 # WhatsHap requires a bgzipped, tabix-indexed VCF.
 # If the provided VCF is uncompressed, bgzip/index a copy in tmpdir.
 if [[ "$vcf" != *.gz ]]; then
@@ -55,18 +51,39 @@ elif [ ! -f "${vcf}.tbi" ]; then
     vcf="$tmpdir/phased.vcf.gz"
 fi
 
+# Filter BAM to autosomes + chrX before running whatshap.
+# chrY is excluded — it is highly repetitive, causes whatshap contig errors,
+# and is routinely excluded from ChIP-seq analysis.
+# The original $ALIGNED_BAM (with all contigs) is still used by step4.
+FILTERED_BAM="$tmpdir/output.autosomes.bam"
+CHROMS="chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 \
+        chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 \
+        chr20 chr21 chr22 chrX"
+
+echo "$(date) Filtering BAM to autosomes + chrX (excluding chrY)..."
+samtools view -@ 4 -b "$ALIGNED_BAM" $CHROMS -o "$FILTERED_BAM"
+samtools index "$FILTERED_BAM"
+
+HAPLOTAGGED_BAM="$tmpdir/output.haplotagged.bam"
+HAPLOTAG_LIST="$tmpdir/haplotag-list.txt"
+HAP1_OUT="$outputdir/hap1.bam"
+HAP2_OUT="$outputdir/hap2.bam"
+UNTAGGED_OUT="$outputdir/untagged.bam"
+
 echo "$(date) Running WhatsHap haplotag..."
 whatshap haplotag \
     --output "$HAPLOTAGGED_BAM" \
     --reference "$refSeq" \
-    "$vcf" \
-    "$ALIGNED_BAM"
+    --ignore-read-groups \
+    --output-haplotag-list "$HAPLOTAG_LIST" \
+    --skip-missing-contigs \
+    "$vcf" "$FILTERED_BAM"
 
-echo "$(date) Indexing haplotagged BAM..."
-samtools index "$HAPLOTAGGED_BAM"
-
-echo "$(date) Splitting by HP tag..."
-samtools view -@ 2 -b -d HP:1 "$HAPLOTAGGED_BAM" > "$HAP1_OUT"
-samtools view -@ 2 -b -d HP:2 "$HAPLOTAGGED_BAM" > "$HAP2_OUT"
+echo "$(date) Running WhatsHap split..."
+whatshap split \
+    --output-h1 "$HAP1_OUT" \
+    --output-h2 "$HAP2_OUT" \
+    --output-untagged "$UNTAGGED_OUT" \
+    "$HAPLOTAGGED_BAM" "$HAPLOTAG_LIST"
 
 echo "$(date) WhatsHap haplotagging and splitting complete."
