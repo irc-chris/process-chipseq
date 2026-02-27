@@ -100,9 +100,9 @@ if [ "$from_step" -gt 1 ]; then
 fi
 
 # ---- Job submission ----
-# PREV_JOB tracks the dependency for step 3 (set by step 1 or 2).
-# PREV_JOB4 tracks the dependency for step 4 (same as PREV_JOB since step 4
-# runs in parallel with step 3, both depending on step 2).
+# Initialise all job ID variables so --from-step N never hits an unbound variable.
+# Empty string = no dependency (job runs immediately).
+JOB1="" JOB2="" JOB3="" JOB4="" JOB5=""
 PREV_JOB=""
 
 submit() {
