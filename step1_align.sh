@@ -2,7 +2,7 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 #SBATCH --time=48:00:00
-#SBATCH --mem=30G
+#SBATCH --mem=50G
 #SBATCH --partition=weka
 #SBATCH --cpus-per-task=21
 
@@ -42,12 +42,12 @@ if [ "$singleend" -eq 0 ]; then
     echo "Combining paired-end FASTQs..."
     cat "$topDir/fastq/"*R1*.fastq > "$tmpdir/.tmp_R1.fastq"
     cat "$topDir/fastq/"*R2*.fastq > "$tmpdir/.tmp_R2.fastq"
-    bwa mem -t 20 -SP5M "$refSeq" "$tmpdir/.tmp_R1.fastq" "$tmpdir/.tmp_R2.fastq" \
+    bwa mem -t 20 -SPM "$refSeq" "$tmpdir/.tmp_R1.fastq" "$tmpdir/.tmp_R2.fastq" \
         | samtools sort -@ 4 -o "$ALIGNED_BAM"
 else
     echo "Combining single-end FASTQs..."
     cat "$topDir/fastq/"*.fastq > "$tmpdir/.tmp_R1.fastq"
-    bwa mem -t 20 -SP5M "$refSeq" "$tmpdir/.tmp_R1.fastq" \
+    bwa mem -t 20 -SPM "$refSeq" "$tmpdir/.tmp_R1.fastq" \
         | samtools sort -@ 4 -o "$ALIGNED_BAM"
 fi
 
