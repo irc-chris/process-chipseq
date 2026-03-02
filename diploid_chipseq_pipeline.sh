@@ -49,7 +49,6 @@ SCRIPT_DIR=$(dirname "$(realpath "$0")")
 topDir=$(jq -r '.topDir'          "$configFile")
 mode=$(jq -r   '.mode // "haploid"' "$configFile")
 name=${topDir##*/}
-tmpdir="$topDir/tmp"
 outputdir="$topDir/${mode}-aligned"
 tmpdir="$outputdir/tmp"
 logdir="$outputdir/logs"
