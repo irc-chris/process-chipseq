@@ -33,11 +33,11 @@ HAP2_BAM="$outputdir/hap2.sorted.bam"
 # In haploid mode they come from splitting a single alignment via WhatsHap HP tags.
 # Either way, hap1 is counted against bedfile1 and hap2 against bedfile2.
 
-echo -e "chr\tstart\tend\tcount" > "$outputdir/hap1_counts.tsv"
-echo -e "chr\tstart\tend\tcount" > "$outputdir/hap2_counts.tsv"
+echo -e "CHR\tPOS1\tPOS2\thaplotype1" > "$outputdir/hap1_counts.tsv"
+echo -e "CHR\tPOS1\tPOS2\thaplotype2" > "$outputdir/hap2_counts.tsv"
 
 echo "$(date) Getting counts: hap1 vs bedfile1..."
-bedtools multicov -bams "$HAP1_BAM" -bed "$bedfile1" > "$outputdir/hap1_counts.tsv"
+bedtools multicov -bams "$HAP1_BAM" -bed "$bedfile1" >> "$outputdir/hap1_counts.tsv"
 echo "Counts written to $outputdir/hap1_counts.tsv"
 
 echo "$(date) Getting counts: hap2 vs bedfile2..."
