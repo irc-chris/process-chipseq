@@ -50,7 +50,8 @@ topDir=$(jq -r '.topDir'          "$configFile")
 mode=$(jq -r   '.mode // "haploid"' "$configFile")
 name=${topDir##*/}
 tmpdir="$topDir/tmp"
-outputdir="$topDir/aligned"
+outputdir="$topDir/${mode}-aligned"
+logdir="$outputdir/logs"
 
 [[ "$mode" == "diploid" || "$mode" == "haploid" ]] \
     || { echo "mode must be \"diploid\" or \"haploid\""; exit 1; }
@@ -73,10 +74,14 @@ check_files() {
     $all_ok || { echo "Missing required inputs for step $step. Aborting."; exit 1; }
 }
 
+mkdir -p "$logdir"
+
 echo "=== ChIP-seq Pipeline ==="
 echo "  config:     $configFile"
 echo "  mode:       $mode"
 echo "  name:       $name"
+echo "  outputdir:  $outputdir"
+echo "  logs:       $logdir"
 echo "  from step:  $from_step"
 echo ""
 
@@ -112,6 +117,8 @@ submit() {
     [ -n "$dep" ] && dep_flag="--dependency=afterok:$dep"
     sbatch --parsable \
         --job-name="${name}_${suffix}" \
+        --output="$logdir/%x_%j.out" \
+        --error="$logdir/%x_%j.err" \
         $dep_flag \
         "$SCRIPT_DIR/$script" "$@"
 }
