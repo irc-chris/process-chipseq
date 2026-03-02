@@ -49,8 +49,8 @@ SCRIPT_DIR=$(dirname "$(realpath "$0")")
 topDir=$(jq -r '.topDir'          "$configFile")
 mode=$(jq -r   '.mode // "haploid"' "$configFile")
 name=${topDir##*/}
-tmpdir="$topDir/tmp"
 outputdir="$topDir/${mode}-aligned"
+tmpdir="$outputdir/tmp"
 logdir="$outputdir/logs"
 
 [[ "$mode" == "diploid" || "$mode" == "haploid" ]] \
@@ -89,13 +89,13 @@ if [ "$from_step" -gt 1 ]; then
     echo "Checking required files for step $from_step..."
     case "$from_step" in
         2)
-            check_files 2 "$tmpdir/output.sorted.bam"
+            check_files 2 "$outputdir/tmp/output.sorted.bam"
             ;;
         3)
             check_files 3 "$outputdir/hap1.bam" "$outputdir/hap2.bam"
             ;;
         4)
-            check_files 4 "$tmpdir/output.sorted.bam"
+            check_files 4 "$outputdir/tmp/output.sorted.bam"
             ;;
         5)
             check_files 5 "$outputdir/hap1.sorted.bam" "$outputdir/hap2.sorted.bam"

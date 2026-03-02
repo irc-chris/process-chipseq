@@ -31,7 +31,7 @@ esac
 
 mode=$(jq -r '.mode // "haploid"' "$configFile")
 outputdir="$topDir/${mode}-aligned"
-tmpdir="$topDir/tmp"
+tmpdir="$outputdir/tmp"
 mkdir -p "$outputdir" "$tmpdir"
 
 ALIGNED_BAM="$tmpdir/output.sorted.bam"
