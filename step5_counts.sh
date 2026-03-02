@@ -14,14 +14,15 @@ configFile=${1:?"Usage: $0 config.json"}
 [ -f "$configFile" ] || { echo "Config not found: $configFile"; exit 1; }
 command -v bedtools >/dev/null 2>&1 || { echo "bedtools not in PATH"; exit 1; }
 
-topDir=$(jq -r '.topDir'    "$configFile")
+topDir=$(jq -r '.topDir'     "$configFile")
+mode=$(jq -r '.mode // "haploid"' "$configFile")
 bedfile1=$(jq -r '.bedfile1' "$configFile")
 bedfile2=$(jq -r '.bedfile2' "$configFile")
 
 [ -f "$bedfile1" ] || { echo "bedfile1 not found: $bedfile1"; exit 1; }
 [ -f "$bedfile2" ] || { echo "bedfile2 not found: $bedfile2"; exit 1; }
 
-outputdir="$topDir/aligned"
+outputdir="$topDir/${mode}-aligned"
 HAP1_BAM="$outputdir/hap1.sorted.bam"
 HAP2_BAM="$outputdir/hap2.sorted.bam"
 

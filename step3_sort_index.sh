@@ -14,7 +14,8 @@ configFile=${1:?"Usage: $0 config.json"}
 [ -f "$configFile" ] || { echo "Config not found: $configFile"; exit 1; }
 
 topDir=$(jq -r '.topDir' "$configFile")
-outputdir="$topDir/aligned"
+mode=$(jq -r '.mode // "haploid"' "$configFile")
+outputdir="$topDir/${mode}-aligned"
 
 HAP1_IN="$outputdir/hap1.bam"
 HAP2_IN="$outputdir/hap2.bam"

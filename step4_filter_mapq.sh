@@ -14,9 +14,10 @@ configFile=${1:?"Usage: $0 config.json"}
 [ -f "$configFile" ] || { echo "Config not found: $configFile"; exit 1; }
 
 topDir=$(jq -r '.topDir' "$configFile")
+mode=$(jq -r '.mode // "haploid"' "$configFile")
 
 TOTAL_BAM="$topDir/tmp/output.sorted.bam"
-outputdir="$topDir/aligned"
+outputdir="$topDir/${mode}-aligned"
 base="$outputdir/output"
 
 [ -f "$TOTAL_BAM" ] || { echo "Total BAM not found: $TOTAL_BAM"; exit 1; }
