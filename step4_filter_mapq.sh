@@ -16,8 +16,8 @@ configFile=${1:?"Usage: $0 config.json"}
 topDir=$(jq -r '.topDir' "$configFile")
 mode=$(jq -r '.mode // "haploid"' "$configFile")
 
-TOTAL_BAM="$topDir/tmp/output.sorted.bam"
 outputdir="$topDir/${mode}-aligned"
+TOTAL_BAM="$outputdir/tmp/output.sorted.bam"
 base="$outputdir/output"
 
 [ -f "$TOTAL_BAM" ] || { echo "Total BAM not found: $TOTAL_BAM"; exit 1; }

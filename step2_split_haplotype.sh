@@ -16,8 +16,8 @@ configFile=${1:?"Usage: $0 config.json"}
 topDir=$(jq -r '.topDir' "$configFile")
 mode=$(jq -r '.mode // "haploid"' "$configFile")
 
-ALIGNED_BAM="$topDir/tmp/output.sorted.bam"
 outputdir="$topDir/${mode}-aligned"
+ALIGNED_BAM="$outputdir/tmp/output.sorted.bam"
 
 [ -f "$ALIGNED_BAM" ] || { echo "Aligned BAM not found: $ALIGNED_BAM"; exit 1; }
 

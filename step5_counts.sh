@@ -34,11 +34,11 @@ HAP2_BAM="$outputdir/hap2.sorted.bam"
 # Either way, hap1 is counted against bedfile1 and hap2 against bedfile2.
 
 echo "$(date) Getting counts: hap1 vs bedfile1..."
-bedtools multicov -bams "$HAP1_BAM" -bed "$bedfile1" > "$topDir/hap1_counts.tsv"
-echo "Counts written to $topDir/hap1_counts.tsv"
+bedtools multicov -bams "$HAP1_BAM" -bed "$bedfile1" > "$outputdir/hap1_counts.tsv"
+echo "Counts written to $outputdir/hap1_counts.tsv"
 
 echo "$(date) Getting counts: hap2 vs bedfile2..."
-bedtools multicov -bams "$HAP2_BAM" -bed "$bedfile2" > "$topDir/hap2_counts.tsv"
-echo "Counts written to $topDir/hap2_counts.tsv"
+bedtools multicov -bams "$HAP2_BAM" -bed "$bedfile2" > "$outputdir/hap2_counts.tsv"
+echo "Counts written to $outputdir/hap2_counts.tsv"
 
 echo "$(date) Counts complete."

@@ -32,8 +32,8 @@ esac
 [ -e "$refSeq" ] || { echo "Reference not found: $refSeq"; exit 1; }
 
 mode=$(jq -r '.mode // "haploid"' "$configFile")
-tmpdir="$topDir/tmp"
 outputdir="$topDir/${mode}-aligned"
+tmpdir="$outputdir/tmp"
 ALIGNED_BAM="$tmpdir/output.sorted.bam"
 
 [ -f "$ALIGNED_BAM" ] || { echo "Aligned BAM not found: $ALIGNED_BAM"; exit 1; }
