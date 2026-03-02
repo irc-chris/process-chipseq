@@ -1,0 +1,10 @@
+{
+  "genomeID": "GRCh38",
+  "topDir": "/mnt/altnas/work/ishawnia/empvsag/process-chipseq/SRR18530773",
+  "mode": "haploid",
+  "singleend": 0,
+  "vcf":      "/gpfs0/work/suhas/scripts/diploid/NA12878.vcf",
+  "bedfile1": "/mnt/altnas/work/ishawnia/empvsag/process-chipseq/anchors.bed",
+  "bedfile2": "/mnt/altnas/work/ishawnia/empvsag/process-chipseq/anchors.bed"
+  
+}

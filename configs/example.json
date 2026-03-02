@@ -1,0 +1,9 @@
+{
+  "genomeID": "GMdip/GRCh38",
+  "topDir":   "/path/to/experiment",
+  "mode":     "diploid/haploid",
+  "singleend": 0,
+  "vcf":      "/gpfs0/work/suhas/scripts/diploid/NA12878.vcf",
+  "bedfile1": "/path/to/anchors_h1.bed",
+  "bedfile2": "/path/to/anchors_h2.bed"
+}
