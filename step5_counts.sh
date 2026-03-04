@@ -38,6 +38,8 @@ fi
 
 echo -e "CHR\tPOS1\tPOS2\thaplotype1" > "$outputdir/hap1_counts.tsv"
 echo -e "CHR\tPOS1\tPOS2\thaplotype2" > "$outputdir/hap2_counts.tsv"
+echo -e "CHR\tPOS1\tPOS2\thaplotype1" > "$outputdir/hap1_mapq${mapq}_counts.tsv"
+echo -e "CHR\tPOS1\tPOS2\thaplotype2" > "$outputdir/hap2_mapq${mapq}_counts.tsv"
 
 HAP1_FILTERED="$outputdir/hap1_mapq${mapq}.bam"
 HAP2_FILTERED="$outputdir/hap2_mapq${mapq}.bam"
@@ -48,7 +50,7 @@ bedtools multicov -bams "$HAP1_BAM" -bed "$bedfile1" >> "$outputdir/hap1_counts.
 echo "Counts written to $outputdir/hap1_counts.tsv"
 
 echo "$(date) Getting counts: hap2 vs bedfile2..."
-bedtools multicov -bams "$HAP2_BAM" -bed "$bedfile2" > "$outputdir/hap2_counts.tsv"
+bedtools multicov -bams "$HAP2_BAM" -bed "$bedfile2" >> "$outputdir/hap2_counts.tsv"
 echo "Counts written to $outputdir/hap2_counts.tsv"
 
 # --- Filter hap BAMs by MAPQ (>= threshold) ---
@@ -63,11 +65,11 @@ echo "Filtered BAM written to $HAP2_FILTERED"
 
 # --- Filtered counts ---
 echo "$(date) Getting filtered counts: hap1_mapq${mapq} vs bedfile1..."
-bedtools multicov -bams "$HAP1_FILTERED" -bed "$bedfile1" > "$outputdir/hap1_mapq${mapq}_counts.tsv"
+bedtools multicov -bams "$HAP1_FILTERED" -bed "$bedfile1" >> "$outputdir/hap1_mapq${mapq}_counts.tsv"
 echo "Counts written to $outputdir/hap1_mapq${mapq}_counts.tsv"
 
 echo "$(date) Getting filtered counts: hap2_mapq${mapq} vs bedfile2..."
-bedtools multicov -bams "$HAP2_FILTERED" -bed "$bedfile2" > "$outputdir/hap2_mapq${mapq}_counts.tsv"
+bedtools multicov -bams "$HAP2_FILTERED" -bed "$bedfile2" >> "$outputdir/hap2_mapq${mapq}_counts.tsv"
 echo "Counts written to $outputdir/hap2_mapq${mapq}_counts.tsv"
 
 echo "$(date) Counts complete."
