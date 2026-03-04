@@ -29,19 +29,45 @@ HAP2_BAM="$outputdir/hap2.sorted.bam"
 [ -f "$HAP1_BAM" ] || { echo "hap1 sorted BAM not found: $HAP1_BAM"; exit 1; }
 [ -f "$HAP2_BAM" ] || { echo "hap2 sorted BAM not found: $HAP2_BAM"; exit 1; }
 
-# In diploid mode hap1/hap2 BAMs come from two separate alignments.
-# In haploid mode they come from splitting a single alignment via WhatsHap HP tags.
-# Either way, hap1 is counted against bedfile1 and hap2 against bedfile2.
+# MAPQ threshold: >=30 for haploid, >=10 for diploid
+if [ "$mode" = "haploid" ]; then
+    mapq=30
+else
+    mapq=10
+fi
 
 echo -e "CHR\tPOS1\tPOS2\thaplotype1" > "$outputdir/hap1_counts.tsv"
 echo -e "CHR\tPOS1\tPOS2\thaplotype2" > "$outputdir/hap2_counts.tsv"
 
+HAP1_FILTERED="$outputdir/hap1_mapq${mapq}.bam"
+HAP2_FILTERED="$outputdir/hap2_mapq${mapq}.bam"
+
+# --- Unfiltered counts ---
 echo "$(date) Getting counts: hap1 vs bedfile1..."
 bedtools multicov -bams "$HAP1_BAM" -bed "$bedfile1" >> "$outputdir/hap1_counts.tsv"
 echo "Counts written to $outputdir/hap1_counts.tsv"
 
 echo "$(date) Getting counts: hap2 vs bedfile2..."
-bedtools multicov -bams "$HAP2_BAM" -bed "$bedfile2" >> "$outputdir/hap2_counts.tsv"
+bedtools multicov -bams "$HAP2_BAM" -bed "$bedfile2" > "$outputdir/hap2_counts.tsv"
 echo "Counts written to $outputdir/hap2_counts.tsv"
+
+# --- Filter hap BAMs by MAPQ (>= threshold) ---
+echo "$(date) Filtering hap BAMs at MAPQ >= ${mapq}..."
+samtools view -@ 2 -b -q "$mapq" "$HAP1_BAM" -o "$HAP1_FILTERED"
+samtools index "$HAP1_FILTERED"
+echo "Filtered BAM written to $HAP1_FILTERED"
+
+samtools view -@ 2 -b -q "$mapq" "$HAP2_BAM" -o "$HAP2_FILTERED"
+samtools index "$HAP2_FILTERED"
+echo "Filtered BAM written to $HAP2_FILTERED"
+
+# --- Filtered counts ---
+echo "$(date) Getting filtered counts: hap1_mapq${mapq} vs bedfile1..."
+bedtools multicov -bams "$HAP1_FILTERED" -bed "$bedfile1" > "$outputdir/hap1_mapq${mapq}_counts.tsv"
+echo "Counts written to $outputdir/hap1_mapq${mapq}_counts.tsv"
+
+echo "$(date) Getting filtered counts: hap2_mapq${mapq} vs bedfile2..."
+bedtools multicov -bams "$HAP2_FILTERED" -bed "$bedfile2" > "$outputdir/hap2_mapq${mapq}_counts.tsv"
+echo "Counts written to $outputdir/hap2_mapq${mapq}_counts.tsv"
 
 echo "$(date) Counts complete."
